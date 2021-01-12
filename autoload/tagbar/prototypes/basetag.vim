@@ -19,6 +19,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.data_type     = ''
     let newobj.path          = ''
     let newobj.fullpath      = a:name
+    let newobj.fullname      = a:name
     let newobj.depth         = 0
     let newobj.parent        = {}
     let newobj.tline         = -1
@@ -26,6 +27,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.typeinfo      = {}
     let newobj._childlist    = []
     let newobj._childdict    = {}
+    let newobj.scopestr      = ''
 
     let newobj.isNormalTag = function(s:add_snr('s:isNormalTag'))
     let newobj.isPseudoTag = function(s:add_snr('s:isPseudoTag'))
@@ -85,7 +87,7 @@ function! s:_getPrefix() abort dict
     let fileinfo = self.fileinfo
 
     if !empty(self._childlist)
-        if fileinfo.tagfolds[self.fields.kind][self.fullpath]
+        if fileinfo.tagfolds[self.fields.kind][self.fullname]
             let prefix = g:tagbar#icon_closed
         else
             let prefix = g:tagbar#icon_open
@@ -97,8 +99,6 @@ function! s:_getPrefix() abort dict
     if g:tagbar_show_visibility
         if has_key(self.fields, 'access')
             let prefix .= get(s:visibility_symbols, self.fields.access, ' ')
-        elseif has_key(self.fields, 'file')
-            let prefix .= s:visibility_symbols.private
         else
             let prefix .= ' '
         endif
@@ -111,17 +111,27 @@ endfunction
 function! s:initFoldState(known_files) abort dict
     let fileinfo = self.fileinfo
 
+    if !empty(self.parent)
+        let self.fullname = self.parent.fullname . self.typeinfo.sro . self.name
+    else
+        let self.fullname = self.fullpath
+    endif
+
+    if has_key(self.fields, 'signature')
+        let self.fullname .= self.fields.signature
+    endif
+
     if a:known_files.has(fileinfo.fpath) &&
      \ has_key(fileinfo, '_tagfolds_old') &&
-     \ has_key(fileinfo._tagfolds_old[self.fields.kind], self.fullpath)
+     \ has_key(fileinfo._tagfolds_old[self.fields.kind], self.fullname)
         " The file has been updated and the tag was there before, so copy its
         " old fold state
-        let fileinfo.tagfolds[self.fields.kind][self.fullpath] =
-                    \ fileinfo._tagfolds_old[self.fields.kind][self.fullpath]
+        let fileinfo.tagfolds[self.fields.kind][self.fullname] =
+                    \ fileinfo._tagfolds_old[self.fields.kind][self.fullname]
     elseif self.depth >= fileinfo.foldlevel
-        let fileinfo.tagfolds[self.fields.kind][self.fullpath] = 1
+        let fileinfo.tagfolds[self.fields.kind][self.fullname] = 1
     else
-        let fileinfo.tagfolds[self.fields.kind][self.fullpath] =
+        let fileinfo.tagfolds[self.fields.kind][self.fullname] =
                     \ fileinfo.kindfolds[self.fields.kind]
     endif
 endfunction
@@ -154,13 +164,13 @@ endfunction
 
 " s:isFolded() {{{1
 function! s:isFolded() abort dict
-    return self.fileinfo.tagfolds[self.fields.kind][self.fullpath]
+    return self.fileinfo.tagfolds[self.fields.kind][self.fullname]
 endfunction
 
 " s:openFold() {{{1
 function! s:openFold() abort dict
     if self.isFoldable()
-        let self.fileinfo.tagfolds[self.fields.kind][self.fullpath] = 0
+        let self.fileinfo.tagfolds[self.fields.kind][self.fullname] = 0
     endif
 endfunction
 
@@ -168,18 +178,14 @@ endfunction
 function! s:closeFold() abort dict
     let newline = line('.')
 
-    if !empty(self.parent) && self.parent.isKindheader()
-        " Tag is child of generic 'kind'
-        call self.parent.closeFold()
-        let newline = self.parent.tline
-    elseif self.isFoldable() && !self.isFolded()
+    if self.isFoldable() && !self.isFolded()
         " Tag is parent of a scope and is not folded
-        let self.fileinfo.tagfolds[self.fields.kind][self.fullpath] = 1
+        let self.fileinfo.tagfolds[self.fields.kind][self.fullname] = 1
         let newline = self.tline
     elseif !empty(self.parent)
         " Tag is normal child, so close parent
         let parent = self.parent
-        let self.fileinfo.tagfolds[parent.fields.kind][parent.fullpath] = 1
+        let self.fileinfo.tagfolds[parent.fields.kind][parent.fullname] = 1
         let newline = parent.tline
     endif
 
@@ -188,7 +194,7 @@ endfunction
 
 " s:setFolded() {{{1
 function! s:setFolded(folded) abort dict
-    let self.fileinfo.tagfolds[self.fields.kind][self.fullpath] = a:folded
+    let self.fileinfo.tagfolds[self.fields.kind][self.fullname] = a:folded
 endfunction
 
 " s:openParents() {{{1

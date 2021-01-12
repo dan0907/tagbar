@@ -31,11 +31,6 @@ function! s:strfmt() abort dict
     let suffix = get(self.fields, 'signature', '')
     if has_key(self.fields, 'type')
         let suffix .= ' : ' . self.fields.type
-    elseif has_key(get(typeinfo, 'kind2scope', {}), self.fields.kind)
-        let scope = s:maybe_map_scope(typeinfo.kind2scope[self.fields.kind])
-        if !g:tagbar_show_data_type
-            let suffix .= ' : ' . scope
-        endif
     endif
     let prefix = self._getPrefix()
 
@@ -48,6 +43,14 @@ function! s:strfmt() abort dict
     elseif g:tagbar_show_tag_linenumbers == 2
         let prefix .= '[' . self.fields.line . '] '
     endif
+
+    if has_key(get(typeinfo, 'kind2scope', {}), self.fields.kind) && self.fields.kind !=# 'f'
+        let self.scopestr = s:maybe_map_scope(typeinfo.kind2scope[self.fields.kind]) . ' '
+        if has_key(self.fields, 'properties') && self.fields.properties =~# 'scopedenum'
+            let self.scopestr .= 'class '
+        endif
+    endif
+    let prefix .= self.scopestr
 
     return prefix . self.name . suffix
 endfunction

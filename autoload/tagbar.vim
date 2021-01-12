@@ -1304,7 +1304,7 @@ function! s:ProcessFile(fname, ftype) abort
     " Create a placeholder tag for the 'kind' header for folding purposes, but
     " only for non-scoped tags
     for kind in typeinfo.kinds
-        if has_key(get(typeinfo, 'kind2scope', {}), kind.short)
+        if has_key(get(typeinfo, 'kind2scope', {}), kind.short) && kind.short !=# 'f'
             continue
         endif
 
@@ -1391,6 +1391,10 @@ function! s:ExecuteCtagsOnFile(fname, realfname, typeinfo) abort
         " Third-party programs may not necessarily make use of this
         if has_key(a:typeinfo, 'ctagstype')
             let ctags_type = a:typeinfo.ctagstype
+
+            if ctags_type ==# 'c++'
+                let ctags_args += [ '--fields-c++=+{properties}' ]
+            endif
 
             let ctags_kinds = ''
             for kind in a:typeinfo.kinds
@@ -1583,6 +1587,19 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         return
     endif
 
+    if taginfo.fields.kind ==# 'f' && !has_key(taginfo.fields, 'signature')
+        let taginfo.fields.signature = '()'
+    endif
+
+    if has_key(taginfo.fields, 'properties')
+        if taginfo.fields.properties =~# 'default'
+            let taginfo.fields.kind = 'f'
+        elseif taginfo.fields.properties =~# 'delete'
+            let taginfo.fields.kind = 'f'
+            let taginfo.fields.signature .= ' = delete'
+        endif
+    endif
+
     let taginfo.fileinfo = a:fileinfo
     let taginfo.typeinfo = a:typeinfo
 
@@ -1621,6 +1638,8 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     let pathlist = split(taginfo.path, '\V' . escape(a:typeinfo.sro, '\'))
     let taginfo.depth = len(pathlist)
 
+    call s:add_tag_recursive({}, taginfo, pathlist)
+
     " Needed for folding
     try
         call taginfo.initFoldState(s:known_files)
@@ -1636,8 +1655,6 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         endif
         return
     endtry
-
-    call s:add_tag_recursive({}, taginfo, pathlist)
 endfunction
 
 " s:add_tag_recursive() {{{2
@@ -1723,6 +1740,7 @@ function! s:add_tag_recursive(parent, taginfo, pathlist) abort
         for tag in name_siblings
             if tag.fields.kind ==# '?'
              \ || get(a:taginfo.typeinfo.kind2scope, tag.fields.kind, '') ==# a:taginfo.scope
+             \ || tag.fields.kind ==# 's' && a:taginfo.scope ==# 'class'
                 call add(parents, tag)
             endif
         endfor
@@ -2009,7 +2027,7 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
             continue
         endif
 
-        if has_key(get(a:typeinfo, 'kind2scope', {}), kind.short)
+        if has_key(get(a:typeinfo, 'kind2scope', {}), kind.short) && kind.short !=# 'f'
             " Scoped tags
             for tag in curtags
                 call s:PrintTag(tag, 0, output, a:fileinfo, a:typeinfo)
@@ -2033,7 +2051,7 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
                 let tag_count = ' (' . len(curtags) . ')'
                 call add(output, foldmarker . padding . kind.long . tag_count)
             else
-                call add(output, foldmarker . padding . kind.long)
+                call add(output, foldmarker . padding . '[' . kind.long . ']')
             endif
 
             let curline                   = len(output) + offset
@@ -2041,16 +2059,22 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
             let a:fileinfo.tline[curline] = kindtag
 
             if !kindtag.isFolded()
-                for tag in curtags
-                    let str = tag.strfmt()
-                    call add(output, repeat(' ', g:tagbar_indent) . str)
+                if kind.short ==# 'f'
+                    for tag in curtags
+                        call s:PrintTag(tag, 0, output, a:fileinfo, a:typeinfo)
+                    endfor
+                else
+                    for tag in curtags
+                        let str = tag.strfmt()
+                        call add(output, str)
 
-                    " Save the current tagbar line in the tag for easy
-                    " highlighting access
-                    let curline                   = len(output) + offset
-                    let tag.tline                 = curline
-                    let a:fileinfo.tline[curline] = tag
-                endfor
+                        " Save the current tagbar line in the tag for easy
+                        " highlighting access
+                        let curline                   = len(output) + offset
+                        let tag.tline                 = curline
+                        let a:fileinfo.tline[curline] = tag
+                    endfor
+                endif
             endif
 
             if g:tagbar_compact != 1
@@ -2098,7 +2122,7 @@ function! s:PrintTag(tag, depth, output, fileinfo, typeinfo) abort
                 " Print 'kind' header of following children, but only if they
                 " are not scope-defining tags (since those already have an
                 " identifier)
-                if !has_key(a:typeinfo.kind2scope, ckind.short)
+                if !has_key(a:typeinfo.kind2scope, ckind.short) || ckind.short ==# 'f'
                     let indent  = (a:depth + 1) * g:tagbar_indent
                     let indent += g:tagbar_show_visibility
                     let indent += 1 " fold symbol
@@ -2292,7 +2316,7 @@ function! s:HighlightTag(openfolds, ...) abort
         if g:tagbar_show_tag_linenumbers == 2 && tagline == tag.tline
             let pattern = '/^\%' . tagline . 'l\s*' . foldpat . '[-+# ]\[[0-9]\+\] \?' . identifier . '/'
         else
-            let pattern = '/^\%' . tagline . 'l\s*' . foldpat . '[-+# ]\?' . identifier . '/'
+            let pattern = '/^\%' . tagline . 'l\s*' . foldpat . '[-+# ]\?' . tag.scopestr . identifier . '/'
         endif
         call tagbar#debug#log("Highlight pattern: '" . pattern . "'")
         if hlexists('TagbarHighlight') " Safeguard in case syntax highlighting is disabled
@@ -2401,8 +2425,26 @@ function! s:JumpToTag(stay_in_tagbar) abort
     if taginfo.fields.column > 0
         call cursor(taginfo.fields.line, taginfo.fields.column)
     else
+        if taginfo.name =~# '^__anon'
+            if taginfo.fields.kind ==# 'f'
+                let target = '\(\w\s*\)\@<!\['
+            else
+                if has_key(taginfo.fileinfo.typeinfo, 'kind2scope')
+                    let target = taginfo.fileinfo.typeinfo.kind2scope[taginfo.fields.kind]
+                else
+                    let target = '\S'
+                endif
+            endif
+        else
+            if taginfo.fields.kind ==# 'n'
+                let no_res = ''
+            else
+                let no_res = '\(\s*::\)\@!'
+            endif
+            let target = '\(^\|\W\)\@<=\V' . substitute(taginfo.name, ' ', ' \\\*', 'g') . '\m' . no_res . '\(\W\|$\)'
+        endif
         call cursor(taginfo.fields.line, 1)
-        call search('\V' . taginfo.name, 'c', line('.'))
+        call search(target, 'c', line('.'))
     endif
 
     normal! zv

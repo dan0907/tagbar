@@ -13,11 +13,17 @@ endif
 
 let s:ics = escape(join(g:tagbar_iconchars, ''), ']^\-')
 
-let s:pattern = '\(^[' . s:ics . '] \?\)\@3<=[^-+: ]\+[^:]\+$'
+let s:pattern = '\(^[' . s:ics . '] \?\)\@3<=\[[^-+: ]\+[^:]\+\]$'
 execute "syntax match TagbarKind '" . s:pattern . "'"
 
-let s:pattern = '\(\S\@<![' . s:ics . '][-+# ]\?\)\@<=[^*(]\+\(\*\?\(([^)]\+)\)\? :\)\@='
+let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ]\)\@<=[a-z][a-z ]\+\( \w\+\(  \)\?$\)\@='
+execute "syntax match TagbarScopeType '" . s:pattern . "'"
+
+let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+$'
 execute "syntax match TagbarScope '" . s:pattern . "'"
+
+let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(  $\)\@='
+execute "syntax match TagbarPseudoScope '" . s:pattern . "'"
 
 let s:pattern = '\S\@<![' . s:ics . ']\([-+# ]\?\)\@='
 execute "syntax match TagbarFoldIcon '" . s:pattern . "'"
@@ -36,27 +42,29 @@ syntax match TagbarHelpKey   '" \zs.*\ze:' contained
 syntax match TagbarHelpTitle '" \zs-\+ \w\+ -\+' contained
 
 syntax match TagbarNestedKind '^\s\+\[[^]]\+\]$'
-syntax match TagbarType       ' : \zs.*' contains=TagbarTagLineN
+syntax match TagbarType       ' : \zs[^\$]*\ze\( \$ \)\?' contains=TagbarTagLineN
 syntax match TagbarTagLineN   '\s\+\[[0-9]\+\]\(\s\+\|$\)'
 syntax match TagbarSignature  '\(\<operator *( *) *\)\?\zs(.*)\ze'
-syntax match TagbarPseudoID   '\*\ze :'
+syntax match TagbarDelete     ' = \zsdelete\ze$'
 
 highlight default link TagbarHelp       Comment
 highlight default link TagbarHelpKey    Identifier
 highlight default link TagbarHelpTitle  PreProc
-highlight default link TagbarKind       Identifier
 highlight default link TagbarNestedKind TagbarKind
-highlight default link TagbarScope      Title
 highlight default link TagbarType       Type
+highlight default link TagbarScopeType  Type
 highlight default link TagbarTagLineN   Comment
-highlight default link TagbarSignature  SpecialKey
-highlight default link TagbarPseudoID   NonText
 highlight default link TagbarFoldIcon   Statement
 highlight default link TagbarHighlight  Search
 
-highlight default TagbarAccessPublic    guifg=Green ctermfg=Green
-highlight default TagbarAccessProtected guifg=Blue  ctermfg=Blue
-highlight default TagbarAccessPrivate   guifg=Red   ctermfg=Red
+highlight default TagbarSignature       guifg=Cyan       ctermfg=DarkCyan
+highlight default TagbarKind            guifg=Orange     ctermfg=DarkYellow
+highlight default TagbarAccessPublic    guifg=Green      ctermfg=Green
+highlight default TagbarAccessProtected guifg=Violet     ctermfg=Blue
+highlight default TagbarAccessPrivate   guifg=Red        ctermfg=Red
+highlight default TagbarScope           gui=Bold         cterm=Bold
+highlight default TagbarPseudoScope     guifg=Yellow     ctermfg=Yellow  gui=Bold  cterm=Bold
+highlight default TagbarDelete          guifg=Red        ctermfg=Red
 highlight default link TagbarVisibilityPublic    TagbarAccessPublic
 highlight default link TagbarVisibilityProtected TagbarAccessProtected
 highlight default link TagbarVisibilityPrivate   TagbarAccessPrivate

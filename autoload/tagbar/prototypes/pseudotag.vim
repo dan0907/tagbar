@@ -17,9 +17,6 @@ function! s:strfmt() abort dict
     let typeinfo = self.typeinfo
 
     let suffix = get(self.fields, 'signature', '')
-    if has_key(typeinfo.kind2scope, self.fields.kind)
-        let suffix .= ' : ' . typeinfo.kind2scope[self.fields.kind]
-    endif
     let prefix = self._getPrefix()
 
     if g:tagbar_show_tag_linenumbers == 1
@@ -27,8 +24,11 @@ function! s:strfmt() abort dict
     elseif g:tagbar_show_tag_linenumbers == 2
         let prefix .= '[' . self.fields.line . '] '
     endif
+    if has_key(typeinfo.kind2scope, self.fields.kind)
+        let prefix .= typeinfo.kind2scope[self.fields.kind] . ' '
+    endif
 
-    return prefix . self.name . '*' . suffix
+    return prefix . self.name . suffix . '  '
 endfunction
 
 " s:add_snr() {{{1
