@@ -37,7 +37,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.getDataType = function(s:add_snr('s:getDataType'))
     let newobj._getPrefix = function(s:add_snr('s:_getPrefix'))
     let newobj.initFoldState = function(s:add_snr('s:initFoldState'))
-    let newobj.getClosedParentTline = function(s:add_snr('s:getClosedParentTline'))
+    let newobj.getClosedParent = function(s:add_snr('s:getClosedParent'))
     let newobj.isFoldable = function(s:add_snr('s:isFoldable'))
     let newobj.isFolded = function(s:add_snr('s:isFolded'))
     let newobj.openFold = function(s:add_snr('s:openFold'))
@@ -137,8 +137,8 @@ function! s:initFoldState(known_files) abort dict
 endfunction
 
 " s:getClosedParentTline() {{{1
-function! s:getClosedParentTline() abort dict
-    let tagline  = self.tline
+function! s:getClosedParent() abort dict
+    let tag  = self
 
     " Find the first closed parent, starting from the top of the hierarchy.
     let parents   = []
@@ -149,12 +149,12 @@ function! s:getClosedParentTline() abort dict
     endwhile
     for parent in reverse(parents)
         if parent.isFolded()
-            let tagline = parent.tline
+            let tag = parent
             break
         endif
     endfor
 
-    return tagline
+    return tag
 endfunction
 
 " s:isFoldable() {{{1

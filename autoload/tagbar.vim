@@ -81,6 +81,7 @@ let s:delayed_update_files = []
 let g:loaded_tagbar = 1
 
 let s:last_highlight_tline = 0
+let s:last_highlight_fline = 0
 
 let s:warnings = {
     \ 'type': [],
@@ -1997,6 +1998,7 @@ function! s:RenderContent(...) abort
 
         " Invalidate highlight cache from old file
         let s:last_highlight_tline = 0
+        let s:last_highlight_fline = 0
     endif
 
     let &lazyredraw  = lazyredraw_save
@@ -2210,6 +2212,8 @@ endfunction
 " s:RenderKeepView() {{{2
 " The gist of this function was taken from NERDTree by Martin Grenfell.
 function! s:RenderKeepView(...) abort
+    let s:last_highlight_tline = 0
+    let s:last_highlight_fline = 0
     if a:0 == 1
         let line = a:1
     else
@@ -2248,13 +2252,30 @@ function! s:HighlightTag(openfolds, ...) abort
 
     let force = a:0 > 0 ? a:1 : 0
 
-    if a:0 > 1
-        let tag = s:GetNearbyTag(g:tagbar_highlight_method, 0, a:2)
-    else
-        let tag = s:GetNearbyTag(g:tagbar_highlight_method, 0)
-    endif
-    if !empty(tag)
+    if a:0 ==# 3
+        let tag = a:3
         let tagline = tag.tline
+    else
+        if a:0 ==# 2
+            let tag = s:GetNearbyTag(g:tagbar_highlight_method, 0, a:2)
+        else
+            let tag = s:GetNearbyTag(g:tagbar_highlight_method, 0)
+        endif
+
+        if !empty(tag)
+            if !force && tag.fields.line ==# s:last_highlight_fline
+                return
+            endif
+
+            if g:tagbar_autoshowtag == 1 || a:openfolds
+                call s:OpenParents(tag)
+            endif
+
+            " Check whether the tag is inside a closed fold and highlight the parent
+            " instead in that case
+            let tag = tag.getClosedParent()
+            let tagline = tag.tline
+        endif
     endif
 
     " Don't highlight the tag again if it's the same one as last time.
@@ -2262,8 +2283,6 @@ function! s:HighlightTag(openfolds, ...) abort
     " the mouse.
     if !force && tagline ==# s:last_highlight_tline
         return
-    else
-        let s:last_highlight_tline = tagline
     endif
 
     let tagbarwinnr = bufwinnr(s:TagbarBufName())
@@ -2285,22 +2304,15 @@ function! s:HighlightTag(openfolds, ...) abort
         match none
 
         " No tag above cursor position so don't do anything
-        if tagline == 0
-            return
-        endif
-
-        if g:tagbar_autoshowtag == 1 || a:openfolds
-            call s:OpenParents(tag)
-        endif
-
-        " Check whether the tag is inside a closed fold and highlight the parent
-        " instead in that case
-        let tagline = tag.getClosedParentTline()
-
-        " Parent tag line number is invalid, better don't do anything
+        " or parent tag line number is invalid, better don't do anything
         if tagline <= 0
+            let s:last_highlight_tline = 0
+            let s:last_highlight_fline = 0
             return
         endif
+
+        let s:last_highlight_fline = tag.fields.line
+        let s:last_highlight_tline = tagline
 
         " Go to the line containing the tag
         execute tagline
@@ -2450,7 +2462,7 @@ function! s:JumpToTag(stay_in_tagbar) abort
     normal! zv
 
     if a:stay_in_tagbar
-        call s:HighlightTag(0)
+        call s:HighlightTag(0, 0, 0, taginfo)
         call s:goto_win(tagbarwinnr)
         redraw
     elseif g:tagbar_autoclose || autoclose
@@ -2464,7 +2476,7 @@ function! s:JumpToTag(stay_in_tagbar) abort
         if s:is_maximized
             call s:ZoomWindow()
         endif
-        call s:HighlightTag(0)
+        call s:HighlightTag(0, 0, 0, taginfo)
     endif
 endfunction
 
