@@ -1633,6 +1633,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
 
             let taginfo.fullpath = taginfo.path . a:typeinfo.sro .
                                  \ taginfo.name
+            if scope ==# 'enum' && has_key(taginfo.fields, 'access')
+                call remove(taginfo.fields, 'access')
+            endif
             break
         endif
     endfor
@@ -1741,7 +1744,7 @@ function! s:add_tag_recursive(parent, taginfo, pathlist) abort
         for tag in name_siblings
             if tag.fields.kind ==# '?'
              \ || get(a:taginfo.typeinfo.kind2scope, tag.fields.kind, '') ==# a:taginfo.scope
-             \ || tag.fields.kind ==# 's' && a:taginfo.scope ==# 'class'
+             \ || (tag.fields.kind ==# 's' || tag.fields.kind ==# 'u') && a:taginfo.scope ==# 'class'
                 call add(parents, tag)
             endif
         endfor
