@@ -572,11 +572,10 @@ function! s:CreateAutocommands() abort
                         \     call s:ShrinkIfExpanded() |
                         \ endif
 
-            autocmd BufWritePost *
-                        \ call s:HandleBufWrite(fnamemodify(expand('<afile>'), ':p'))
-            autocmd CursorHold,CursorHoldI * call s:do_delayed_update()
             " BufReadPost is needed for reloading the current buffer if the file
             " was changed by an external command; see commit 17d199f
+            autocmd BufWritePost * call
+                        \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 1)
             autocmd BufReadPost,BufEnter,CursorHold,FileType * call
                         \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 0)
             if g:tagbar_highlight_follow_insert
@@ -1899,6 +1898,8 @@ endfunction
 " s:RenderContent() {{{2
 function! s:RenderContent(...) abort
     call tagbar#debug#log('RenderContent called')
+    let s:last_highlight_tline = 0
+    let s:last_highlight_fline = 0
     let s:new_window = 0
 
     if a:0 == 1
@@ -2215,8 +2216,6 @@ endfunction
 " s:RenderKeepView() {{{2
 " The gist of this function was taken from NERDTree by Martin Grenfell.
 function! s:RenderKeepView(...) abort
-    let s:last_highlight_tline = 0
-    let s:last_highlight_fline = 0
     if a:0 == 1
         let line = a:1
     else
