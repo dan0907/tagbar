@@ -574,9 +574,9 @@ function! s:CreateAutocommands() abort
 
             " BufReadPost is needed for reloading the current buffer if the file
             " was changed by an external command; see commit 17d199f
-            autocmd BufWritePost * call
+            autocmd BufReadPost,BufWritePost * call
                         \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 1)
-            autocmd BufReadPost,BufEnter,CursorHold,FileType * call
+            autocmd BufEnter,CursorHold * call
                         \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 0)
             if g:tagbar_highlight_follow_insert
                 autocmd CursorHoldI * call
