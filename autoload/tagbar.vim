@@ -1539,6 +1539,12 @@ function! s:ParseTagline(part1, part2, typeinfo, fileinfo) abort
     endif
 endfunction
 
+
+" s:CppStyleStr() {{{2
+function! s:CppStyleStr(str) abort
+    return substitute(a:str, ' \(&\|\*\)\@=', '', 'g')
+endfunction
+
 " s:ProcessTag() {{{2
 function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, fileinfo) abort
     if a:is_split
@@ -1592,8 +1598,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     else
         let taginfo.fields.group = taginfo.fields.kind
     endif
-
-    if taginfo.fields.kind ==# 'f' && !has_key(taginfo.fields, 'signature')
+    if has_key(taginfo.fields, 'signature')
+        let taginfo.fields.signature = substitute(s:CppStyleStr(taginfo.fields.signature), ',\S\@=', ', ', 'g')
+    elseif taginfo.fields.kind ==# 'f'
         let taginfo.fields.signature = '()'
     endif
 
@@ -1616,9 +1623,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let delimit = stridx(typeref, ':')
         let key = strpart(typeref, 0, delimit)
         if key ==# 'typename'
-            let taginfo.data_type = substitute(strpart(typeref, delimit + 1), '\t', '', 'g')
+            let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
         else
-            let taginfo.data_type = substitute(typeref, ':', ' ', 'g')
+            let taginfo.data_type = substitute(typeref, ':', ' ', '')
         endif
     endif
 
