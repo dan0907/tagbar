@@ -34,8 +34,8 @@ function! s:strfmt() abort dict
     endif
     let prefix = self._getPrefix()
 
-    if g:tagbar_show_data_type && self.getDataType() !=# ''
-        let suffix .= ' : ' . self.getDataType()
+    if (self.fields.kind ==# 't' || g:tagbar_show_data_type) && self.getDataType() !=# ''
+        let suffix .= ' = ' . self.getDataType()
     endif
 
     if g:tagbar_show_tag_linenumbers == 1

@@ -1587,6 +1587,12 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         return
     endif
 
+    if (has_key(a:typeinfo, 'groups'))
+        let taginfo.fields.group = a:typeinfo.getKind(taginfo.fields.kind).group
+    else
+        let taginfo.fields.group = taginfo.fields.kind
+    endif
+
     if taginfo.fields.kind ==# 'f' && !has_key(taginfo.fields, 'signature')
         let taginfo.fields.signature = '()'
     endif
@@ -1612,7 +1618,7 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         if key ==# 'typename'
             let taginfo.data_type = substitute(strpart(typeref, delimit + 1), '\t', '', 'g')
         else
-            let taginfo.data_type = key
+            let taginfo.data_type = substitute(typeref, ':', ' ', 'g')
         endif
     endif
 
@@ -1837,6 +1843,11 @@ function! s:create_pseudotag(name, parent, kind, typeinfo, fileinfo) abort
 
     let pseudotag             = tagbar#prototypes#pseudotag#new(a:name)
     let pseudotag.fields.kind = a:kind
+    if (has_key(a:typeinfo, 'groups'))
+        let pseudotag.fields.group = a:typeinfo.getKind(a:kind).group
+    else
+        let pseudotag.fields.group = a:kind
+    endif
 
     let parentscope = substitute(curpath, '\V' . a:name . '$', '', '')
     let parentscope = substitute(parentscope,
@@ -2023,17 +2034,23 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
     let offset = g:tagbar_compact && s:short_help ? 0 : line('.')
     let output = []
 
-    for kind in a:typeinfo.kinds
+    if (has_key(a:typeinfo, 'groups'))
+        let groups = a:typeinfo.groups
+    else
+        let groups = a:typeinfo.kinds
+    endif
+
+    for group in groups
         let curtags = filter(copy(a:fileinfo.getTags()),
-                           \ 'v:val.fields.kind ==# kind.short')
-        call tagbar#debug#log('Printing kind: ' . kind.short .
+                           \ 'v:val.fields.group ==# group.short')
+        call tagbar#debug#log('Printing kind: ' . group.short .
                    \ ', number of (top-level) tags: ' . len(curtags))
 
         if empty(curtags)
             continue
         endif
 
-        if has_key(get(a:typeinfo, 'kind2scope', {}), kind.short) && kind.short !=# 'f'
+        if has_key(get(a:typeinfo, 'kind2scope', {}), group.short) && group.short !=# 'f'
             " Scoped tags
             for tag in curtags
                 call s:PrintTag(tag, 0, output, a:fileinfo, a:typeinfo)
@@ -2044,6 +2061,7 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
             endfor
         else
             " Non-scoped tags
+            let kind = a:typeinfo.getKind(group.short)
             let kindtag = curtags[0].parent
 
             if kindtag.isFolded()
@@ -2117,8 +2135,13 @@ function! s:PrintTag(tag, depth, output, fileinfo, typeinfo) abort
 
     " Recursively print children
     if a:tag.isFoldable() && !a:tag.isFolded()
-        for ckind in a:typeinfo.kinds
-            let childfilter = 'v:val.fields.kind ==# ckind.short'
+        if (has_key(a:typeinfo, 'groups'))
+            let groups = a:typeinfo.groups
+        else
+            let groups = a:typeinfo.kinds
+        endif
+        for group in groups
+            let childfilter = 'v:val.fields.group ==# group.short'
             if g:tagbar_hide_nonpublic
                 let childfilter .=
                       \ ' && get(v:val.fields, "access", "public") ==# "public"'
@@ -2128,7 +2151,8 @@ function! s:PrintTag(tag, depth, output, fileinfo, typeinfo) abort
                 " Print 'kind' header of following children, but only if they
                 " are not scope-defining tags (since those already have an
                 " identifier)
-                if !has_key(a:typeinfo.kind2scope, ckind.short) || ckind.short ==# 'f'
+                if !has_key(a:typeinfo.kind2scope, group.short) || group.short ==# 'f'
+                    let ckind = a:typeinfo.getKind(group.short)
                     let indent  = (a:depth + 1) * g:tagbar_indent
                     let indent += g:tagbar_show_visibility
                     let indent += 1 " fold symbol

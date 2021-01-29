@@ -128,7 +128,7 @@ function! s:initFoldState(known_files) abort dict
         " old fold state
         let fileinfo.tagfolds[self.fields.kind][self.fullname] =
                     \ fileinfo._tagfolds_old[self.fields.kind][self.fullname]
-    elseif self.depth >= fileinfo.foldlevel
+    elseif self.fields.kind ==# 'f' || self.depth >= fileinfo.foldlevel
         let fileinfo.tagfolds[self.fields.kind][self.fullname] = 1
     else
         let fileinfo.tagfolds[self.fields.kind][self.fullname] =

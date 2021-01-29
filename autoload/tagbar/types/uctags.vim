@@ -219,19 +219,29 @@ function! tagbar#types#uctags#init(supported_types) abort
     let type_cpp = tagbar#prototypes#typeinfo#new()
     let type_cpp.ctagstype = 'c++'
     let type_cpp.kinds     = [
-        \ {'short' : 'h', 'long' : 'header files', 'fold' : 1, 'stl' : 0},
-        \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0},
-        \ {'short' : 'n', 'long' : 'namespaces',   'fold' : 0, 'stl' : 1},
-        \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1},
-        \ {'short' : 'e', 'long' : 'enumerators',  'fold' : 0, 'stl' : 0},
-        \ {'short' : 's', 'long' : 'structs',      'fold' : 0, 'stl' : 1},
-        \ {'short' : 'c', 'long' : 'classes',      'fold' : 0, 'stl' : 1},
-        \ {'short' : 'u', 'long' : 'unions',       'fold' : 0, 'stl' : 1},
-        \ {'short' : 't', 'long' : 'typedefs',     'fold' : 1, 'stl' : 0},
-        \ {'short' : 'v', 'long' : 'variables',    'fold' : 1, 'stl' : 0},
-        \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0},
-        \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1},
-        \ {'short' : 'm', 'long' : 'data members', 'fold' : 0, 'stl' : 0}
+        \ {'short' : 'h', 'long' : 'header files', 'fold' : 1, 'stl' : 0, 'group' : 'h'},
+        \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0, 'group' : 'd'},
+        \ {'short' : 'n', 'long' : 'namespaces',   'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'e', 'long' : 'enumerators',  'fold' : 0, 'stl' : 0, 'group' : 'e'},
+        \ {'short' : 's', 'long' : 'structs',      'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'c', 'long' : 'classes',      'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'u', 'long' : 'unions',       'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 't', 'long' : 'typedefs',     'fold' : 1, 'stl' : 0, 'group' : 't'},
+        \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0, 'group' : 'p'},
+        \ {'short' : 'v', 'long' : 'variables',    'fold' : 1, 'stl' : 0, 'group' : 'v'},
+        \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1, 'group' : 'f'},
+        \ {'short' : 'm', 'long' : 'data members', 'fold' : 0, 'stl' : 0, 'group' : 'm'}
+    \ ]
+    let type_cpp.groups     = [
+        \ {'short' : 'h'},
+        \ {'short' : 'd'},
+        \ {'short' : 't'},
+        \ {'short' : 'e'},
+        \ {'short' : 'p'},
+        \ {'short' : 'v'},
+        \ {'short' : 'f'},
+        \ {'short' : 'm'}
     \ ]
     let type_cpp.sro        = '::'
     let type_cpp.kind2scope = {
@@ -240,6 +250,7 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ 'c' : 'class',
         \ 's' : 'struct',
         \ 'u' : 'union',
+        \ 't' : 'using',
         \ 'f' : 'function'
     \ }
     let type_cpp.scope2kind = {
@@ -248,6 +259,7 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ 'class'     : 'c',
         \ 'struct'    : 's',
         \ 'union'     : 'u',
+        \ 'using'     : 't',
         \ 'function'  : 'f'
     \ }
     let types.cpp = type_cpp

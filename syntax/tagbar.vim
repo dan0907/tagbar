@@ -16,10 +16,10 @@ let s:ics = escape(join(g:tagbar_iconchars, ''), ']^\-')
 let s:pattern = '\(^[' . s:ics . '] \?\)\@3<=\[[^-+: ]\+[^:]\+\]$'
 execute "syntax match TagbarKind '" . s:pattern . "'"
 
-let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ]\)\@<=[a-z][a-z ]\+\( \w\+\(  \)\?$\)\@='
+let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ]\)\@<=[a-z][a-z ]\+\( \w\+\(  \| = .\+\)\?$\)\@='
 execute "syntax match TagbarScopeType '" . s:pattern . "'"
 
-let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+$'
+let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(\( = .\+\)\?$\)\@='
 execute "syntax match TagbarScope '" . s:pattern . "'"
 
 let s:pattern = '\(\S\@<![' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(  $\)\@='
