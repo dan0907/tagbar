@@ -219,7 +219,6 @@ function! tagbar#types#uctags#init(supported_types) abort
     let type_cpp = tagbar#prototypes#typeinfo#new()
     let type_cpp.ctagstype = 'c++'
     let type_cpp.kinds     = [
-        \ {'short' : 'h', 'long' : 'header files', 'fold' : 1, 'stl' : 0, 'group' : 'h'},
         \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0, 'group' : 'd'},
         \ {'short' : 'n', 'long' : 'namespaces',   'fold' : 0, 'stl' : 1, 'group' : 't'},
         \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1, 'group' : 't'},
@@ -231,17 +230,16 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0, 'group' : 'p'},
         \ {'short' : 'v', 'long' : 'variables',    'fold' : 1, 'stl' : 0, 'group' : 'v'},
         \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1, 'group' : 'f'},
-        \ {'short' : 'm', 'long' : 'data members', 'fold' : 0, 'stl' : 0, 'group' : 'm'}
+        \ {'short' : 'm', 'long' : 'data members', 'fold' : 0, 'stl' : 0, 'group' : 'm'},
     \ ]
     let type_cpp.groups     = [
-        \ {'short' : 'h'},
         \ {'short' : 'd'},
         \ {'short' : 't'},
         \ {'short' : 'e'},
         \ {'short' : 'p'},
         \ {'short' : 'v'},
         \ {'short' : 'f'},
-        \ {'short' : 'm'}
+        \ {'short' : 'm'},
     \ ]
     let type_cpp.sro        = '::'
     let type_cpp.kind2scope = {
@@ -310,9 +308,28 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ 'n' : 'namespace',
     \ }
     let type_clojure.scope2kind = {
-        \ 'namespace'  : 'n'
+        \ 'namespace'  : 'n',
     \ }
     let types.clojure = type_clojure
+    " CMake {{{1
+    let type_cmake = tagbar#prototypes#typeinfo#new()
+    let type_cmake.ctagstype = 'cmake'
+    let type_cmake.kinds     = [
+        \ {'short': 'p', 'long': 'projects' , 'fold': 0, 'stl': 1},
+        \ {'short': 'm', 'long': 'macros'   , 'fold': 0, 'stl': 1},
+        \ {'short': 'f', 'long': 'functions', 'fold': 0, 'stl': 1},
+        \ {'short': 'D', 'long': 'options'  , 'fold': 0, 'stl': 1},
+        \ {'short': 'v', 'long': 'variables', 'fold': 0, 'stl': 1},
+        \ {'short': 't', 'long': 'tagets'   , 'fold': 0, 'stl': 1},
+    \ ]
+    let type_cmake.sro = '.'
+    let type_cmake.kind2scope = {
+        \ 'f' : 'function',
+    \ }
+    let type_cmake.scope2kind = {
+        \ 'function'  : 'f',
+    \ }
+    let types.cmake = type_cmake
     " Ctags config {{{1
     let type_ctags = tagbar#prototypes#typeinfo#new()
     let type_ctags.ctagstype = 'ctags'
