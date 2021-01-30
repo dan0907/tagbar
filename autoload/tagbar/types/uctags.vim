@@ -219,18 +219,18 @@ function! tagbar#types#uctags#init(supported_types) abort
     let type_cpp = tagbar#prototypes#typeinfo#new()
     let type_cpp.ctagstype = 'c++'
     let type_cpp.kinds     = [
-        \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0, 'group' : 'd'},
-        \ {'short' : 'n', 'long' : 'namespaces',   'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'e', 'long' : 'enumerators',  'fold' : 0, 'stl' : 0, 'group' : 'e'},
-        \ {'short' : 's', 'long' : 'structs',      'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'c', 'long' : 'classes',      'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'u', 'long' : 'unions',       'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 't', 'long' : 'typedefs',     'fold' : 1, 'stl' : 0, 'group' : 't'},
-        \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0, 'group' : 'p'},
-        \ {'short' : 'v', 'long' : 'variables',    'fold' : 1, 'stl' : 0, 'group' : 'v'},
-        \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1, 'group' : 'f'},
-        \ {'short' : 'm', 'long' : 'data members', 'fold' : 0, 'stl' : 0, 'group' : 'm'},
+        \ {'short' : 'd', 'long' : 'macros',                'fold' : 1, 'stl' : 0, 'group' : 'd'},
+        \ {'short' : 'n', 'long' : 'namespaces',            'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'g', 'long' : 'enums',                 'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 's', 'long' : 'structs',               'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'c', 'long' : 'classes',               'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 'u', 'long' : 'unions',                'fold' : 0, 'stl' : 1, 'group' : 't'},
+        \ {'short' : 't', 'long' : 'typedefs',              'fold' : 1, 'stl' : 0, 'group' : 't'},
+        \ {'short' : 'e', 'long' : 'enumerators',           'fold' : 0, 'stl' : 0, 'group' : 'e'},
+        \ {'short' : 'p', 'long' : 'function declarations', 'fold' : 1, 'stl' : 0, 'group' : 'p'},
+        \ {'short' : 'v', 'long' : 'variables',             'fold' : 1, 'stl' : 0, 'group' : 'v'},
+        \ {'short' : 'f', 'long' : 'functions',             'fold' : 0, 'stl' : 1, 'group' : 'f'},
+        \ {'short' : 'm', 'long' : 'data members',          'fold' : 0, 'stl' : 0, 'group' : 'm'},
     \ ]
     let type_cpp.groups     = [
         \ {'short' : 'd'},

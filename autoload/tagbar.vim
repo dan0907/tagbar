@@ -1593,11 +1593,6 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         return
     endif
 
-    if (has_key(a:typeinfo, 'groups'))
-        let taginfo.fields.group = a:typeinfo.getKind(taginfo.fields.kind).group
-    else
-        let taginfo.fields.group = taginfo.fields.kind
-    endif
     if has_key(taginfo.fields, 'signature')
         let taginfo.fields.signature = substitute(s:CppStyleStr(taginfo.fields.signature), ',\S\@=', ', ', 'g')
     elseif taginfo.fields.kind ==# 'f'
@@ -1611,6 +1606,12 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
             let taginfo.fields.kind = 'f'
             let taginfo.fields.signature .= ' = delete'
         endif
+    endif
+
+    if (has_key(a:typeinfo, 'groups'))
+        let taginfo.fields.group = a:typeinfo.getKind(taginfo.fields.kind).group
+    else
+        let taginfo.fields.group = taginfo.fields.kind
     endif
 
     let taginfo.fileinfo = a:fileinfo
