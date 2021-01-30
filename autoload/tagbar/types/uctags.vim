@@ -249,7 +249,7 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ 's' : 'struct',
         \ 'u' : 'union',
         \ 't' : 'using',
-        \ 'f' : 'function'
+        \ 'f' : 'function',
     \ }
     let type_cpp.scope2kind = {
         \ 'enum'      : 'g',
@@ -258,7 +258,7 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ 'struct'    : 's',
         \ 'union'     : 'u',
         \ 'using'     : 't',
-        \ 'function'  : 'f'
+        \ 'function'  : 'f',
     \ }
     let types.cpp = type_cpp
     let types.cuda = type_cpp
@@ -320,7 +320,7 @@ function! tagbar#types#uctags#init(supported_types) abort
         \ {'short': 'f', 'long': 'functions', 'fold': 0, 'stl': 1},
         \ {'short': 'D', 'long': 'options'  , 'fold': 0, 'stl': 1},
         \ {'short': 'v', 'long': 'variables', 'fold': 0, 'stl': 1},
-        \ {'short': 't', 'long': 'tagets'   , 'fold': 0, 'stl': 1},
+        \ {'short': 't', 'long': 'targets'  , 'fold': 0, 'stl': 1},
     \ ]
     let type_cmake.sro = '.'
     let type_cmake.kind2scope = {

@@ -1621,12 +1621,7 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     if has_key(taginfo.fields, 'typeref')
         let typeref = taginfo.fields.typeref
         let delimit = stridx(typeref, ':')
-        let key = strpart(typeref, 0, delimit)
-        if key ==# 'typename'
-            let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
-        else
-            let taginfo.data_type = substitute(typeref, ':', ' ', '')
-        endif
+        let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
     endif
 
     " If this filetype doesn't have any scope information then we can stop
