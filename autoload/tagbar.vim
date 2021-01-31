@@ -1542,7 +1542,7 @@ endfunction
 
 " s:CppStyleStr() {{{2
 function! s:CppStyleStr(str) abort
-    return substitute(a:str, ' \(&\|\*\)\@=', '', 'g')
+    return substitute(substitute(a:str, ' \(&\|\*\)\@=', '', 'g'), '\(\.\.\.\|,\)[^) ]\@=', '\1 ', 'g')
 endfunction
 
 " s:ProcessTag() {{{2
@@ -1594,7 +1594,7 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     endif
 
     if has_key(taginfo.fields, 'signature')
-        let taginfo.fields.signature = substitute(s:CppStyleStr(taginfo.fields.signature), ',\S\@=', ', ', 'g')
+        let taginfo.fields.signature = s:CppStyleStr(taginfo.fields.signature)
     elseif taginfo.fields.kind ==# 'f'
         let taginfo.fields.signature = '()'
     endif
@@ -1622,7 +1622,8 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     if has_key(taginfo.fields, 'typeref')
         let typeref = taginfo.fields.typeref
         let delimit = stridx(typeref, ':')
-        let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
+        let taginfo.data_type = s:CppStyleStr(strpart(typeref, delimit + 1))
+        "let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
     endif
 
     " If this filetype doesn't have any scope information then we can stop
