@@ -1542,7 +1542,7 @@ endfunction
 
 " s:CppStyleStr() {{{2
 function! s:CppStyleStr(str) abort
-    return substitute(substitute(a:str, ' \(&\|\*\)\@=', '', 'g'), '\(\.\.\.\|,\)[^) ]\@=', '\1 ', 'g')
+    return substitute(substitute(a:str, ' \(&\|\*\)\@=', '', 'g'), '\(\.\.\.\w\@=\|,\S\@=\)', '\1 ', 'g')
 endfunction
 
 " s:ProcessTag() {{{2
