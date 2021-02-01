@@ -1,0 +1,19 @@
+	autocmd BufWinEnter <buffer> let t:mybuf = bufnr("%")
+	autocmd BufWinLeave <buffer> unlet! t:mybuf
+
+function! GuiTabLabel()
+	let label = '(' . v:lnum . ') '
+	let bufnrlist = tabpagebuflist(v:lnum)
+
+	let label .= bufname(exists('t:mybuf') ? t:mybuf : bufnrlist[tabpagewinnr(v:lnum) - 1])
+
+	for bufnr in bufnrlist
+		if getbufvar(bufnr, "&modified")
+			let label .= '[+]'
+			break
+		endif
+	endfor
+	return label
+endfunction
+
+set guitablabel=%{GuiTabLabel()}
