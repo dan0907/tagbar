@@ -2350,6 +2350,10 @@ function! s:HighlightTag(openfolds, ...) abort
         " Make sure the tag is visible in the window
         call winline()
 
+        if force
+            normal! z.
+        endif
+
         let foldpat = '[' . g:tagbar#icon_open . g:tagbar#icon_closed . ' ]'
 
         " If printing the line number of the tag to the left, and the tag is
