@@ -2965,7 +2965,7 @@ function! s:AutoUpdate(fname, force, ...) abort
         let s:nearby_disabled = 0
     endif
 
-    call s:HighlightTag(0)
+    call s:HighlightTag(0, a:force)
     call s:SetStatusLine()
     call tagbar#debug#log('AutoUpdate finished successfully')
 endfunction
