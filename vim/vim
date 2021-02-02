@@ -1,19 +1,35 @@
-	autocmd BufWinEnter <buffer> let t:mybuf = bufnr("%")
-	autocmd BufWinLeave <buffer> unlet! t:mybuf
-
 function! GuiTabLabel()
 	let label = '(' . v:lnum . ') '
 	let bufnrlist = tabpagebuflist(v:lnum)
-
-	let label .= bufname(exists('t:mybuf') ? t:mybuf : bufnrlist[tabpagewinnr(v:lnum) - 1])
-
+	let curBufname = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+	if curBufname !=# '' && curBufname !~# 'NERD_tree' && curBufname !~# '__Tagbar__'
+		let label .= curBufname
+		let isFound = 1
+	else
+		let isFound = 0
+	endif
+	let isModified = 0
 	for bufnr in bufnrlist
-		if getbufvar(bufnr, "&modified")
-			let label .= '[+]'
-			break
+		let curBufname = bufname(bufnr)
+		if !isFound && curBufname !=# '' && curBufname !~# 'NERD_tree' && curBufname !~# '__Tagbar__'
+			let label .= curBufname
+			let isFound = 1
+		endif
+		if !isModified && getbufvar(bufnr, "&modified")
+			let isModified = 1
 		endif
 	endfor
+	if isModified
+		let label .= ' [+]'
+	endif
 	return label
+endfunction
+
+function! s:StripTrailingWhitespaces()
+	let l = line(".")
+	let c = col(".")
+	%s/\s\+$//e
+	call cursor(l, c)
 endfunction
 
 set guitablabel=%{GuiTabLabel()}
