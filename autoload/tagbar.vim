@@ -2367,6 +2367,8 @@ function! s:HighlightTag(openfolds, ...) abort
         call tagbar#debug#log("Highlight pattern: '" . pattern . "'")
         if hlexists('TagbarHighlight') " Safeguard in case syntax highlighting is disabled
             execute 'match TagbarHighlight ' . pattern
+            let target = '\(^\|\W\)\@<=\V' . escape(tag.name, '\') . '\m\(\W\|$\)'
+            call search(target, 'c', line('.'))
         else
             execute 'match Search ' . pattern
         endif
@@ -2489,7 +2491,7 @@ function! s:JumpToTag(stay_in_tagbar) abort
             endif
             let target = '\(^\|\W\)\@<=\V' . substitute(taginfo.name, ' ', ' \\\*', 'g') . '\m' . no_res . '\(\W\|$\)'
         endif
-        call cursor(taginfo.fields.line, 1)
+        execute taginfo.fields.line
         call search(target, 'c', line('.'))
     endif
 
