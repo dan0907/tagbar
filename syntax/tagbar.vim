@@ -57,14 +57,14 @@ highlight default link TagbarTagLineN   Comment
 highlight default link TagbarFoldIcon   Statement
 highlight default link TagbarHighlight  Search
 
-highlight default TagbarSignature       guifg=Cyan       ctermfg=DarkCyan
-highlight default TagbarKind            guifg=Orange     ctermfg=DarkYellow
-highlight default TagbarAccessPublic    guifg=Green      ctermfg=Green
-highlight default TagbarAccessProtected guifg=Violet     ctermfg=Blue
-highlight default TagbarAccessPrivate   guifg=Red        ctermfg=Red
-highlight default TagbarScope           gui=Bold         cterm=Bold
-highlight default TagbarPseudoScope     guifg=Yellow     ctermfg=Yellow  gui=Bold  cterm=Bold
-highlight default TagbarDelete          guifg=Red        ctermfg=Red
+highlight default TagbarSignature       guifg=Cyan          ctermfg=DarkCyan
+highlight default TagbarKind            guifg=Orange        ctermfg=DarkYellow
+highlight default TagbarAccessPublic    guifg=Green         ctermfg=Green
+highlight default TagbarAccessProtected guifg=#669AFF       ctermfg=Blue
+highlight default TagbarAccessPrivate   guifg=Red           ctermfg=Red
+highlight default TagbarScope           gui=Bold            cterm=Bold
+highlight default TagbarPseudoScope     guifg=LightMagenta  ctermfg=LightMagenta  gui=Bold  cterm=Bold
+highlight default TagbarDelete          guifg=Red           ctermfg=Red
 highlight default link TagbarVisibilityPublic    TagbarAccessPublic
 highlight default link TagbarVisibilityProtected TagbarAccessProtected
 highlight default link TagbarVisibilityPrivate   TagbarAccessPrivate
