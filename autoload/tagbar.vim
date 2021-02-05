@@ -561,8 +561,8 @@ function! s:CreateAutocommands() abort
             if !g:tagbar_silent
                 autocmd CursorHold __Tagbar__.* call s:ShowPrototype(1)
             endif
-            autocmd WinEnter   __Tagbar__.* call s:SetStatusLine()
-            autocmd WinLeave   __Tagbar__.* call s:SetStatusLine()
+            "autocmd WinEnter   __Tagbar__.* call s:SetStatusLine()
+            autocmd BufEnter * call s:SetStatusLine()
 
             if g:tagbar_autopreview
                 autocmd CursorMoved __Tagbar__.* nested call s:ShowInPreviewWin()
@@ -3503,7 +3503,7 @@ function! s:SetStatusLine() abort
         if flagstr !=# ''
             let flagstr = '[' . flagstr . '] '
         endif
-        let text = colour . '[' . sortstr . '] ' . flagstr . fname
+        let text = colour . ' ' . flagstr . fname
         let &l:statusline = text
     endif
 
