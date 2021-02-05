@@ -576,7 +576,7 @@ function! s:CreateAutocommands() abort
             " was changed by an external command; see commit 17d199f
             autocmd BufReadPost,BufWritePost * call
                         \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 1)
-            autocmd BufEnter,CursorHold * call
+            autocmd CursorHold * call
                         \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'), 0)
             if g:tagbar_highlight_follow_insert
                 autocmd CursorHoldI * call
@@ -1846,10 +1846,16 @@ function! s:create_pseudotag(name, parent, kind, typeinfo, fileinfo) abort
     endif
 
     let pseudotag             = tagbar#prototypes#pseudotag#new(a:name)
-    let pseudotag.fields.kind = a:kind
-    if (has_key(a:typeinfo, 'groups'))
-        let pseudotag.fields.group = a:typeinfo.getKind(a:kind).group
+    if has_key(a:typeinfo, 'groups')
+        if a:kind !=# '?'
+            let kind = a:kind
+        else
+            let kind = 'c'
+        endif
+        let pseudotag.fields.kind = kind
+        let pseudotag.fields.group = a:typeinfo.getKind(kind).group
     else
+        let pseudotag.fields.kind = a:kind
         let pseudotag.fields.group = a:kind
     endif
 

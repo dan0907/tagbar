@@ -59,7 +59,7 @@ highlight default link TagbarHighlight  Search
 
 highlight default TagbarSignature       guifg=Cyan          ctermfg=DarkCyan
 highlight default TagbarKind            guifg=Orange        ctermfg=DarkYellow
-highlight default TagbarAccessPublic    guifg=Green         ctermfg=Green
+highlight default TagbarAccessPublic    guifg=#00CD00       ctermfg=Green
 highlight default TagbarAccessProtected guifg=#669AFF       ctermfg=Blue
 highlight default TagbarAccessPrivate   guifg=Red           ctermfg=Red
 highlight default TagbarScope           gui=Bold            cterm=Bold

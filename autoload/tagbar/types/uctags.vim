@@ -191,28 +191,40 @@ function! tagbar#types#uctags#init(supported_types) abort
     let type_c = tagbar#prototypes#typeinfo#new()
     let type_c.ctagstype = 'c'
     let type_c.kinds     = [
-        \ {'short' : 'h', 'long' : 'header files', 'fold' : 1, 'stl' : 0},
-        \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0},
-        \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0},
-        \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1},
-        \ {'short' : 'e', 'long' : 'enumerators',  'fold' : 0, 'stl' : 0},
-        \ {'short' : 't', 'long' : 'typedefs',     'fold' : 0, 'stl' : 0},
-        \ {'short' : 's', 'long' : 'structs',      'fold' : 0, 'stl' : 1},
-        \ {'short' : 'u', 'long' : 'unions',       'fold' : 0, 'stl' : 1},
-        \ {'short' : 'm', 'long' : 'members',      'fold' : 0, 'stl' : 0},
-        \ {'short' : 'v', 'long' : 'variables',    'fold' : 0, 'stl' : 0},
-        \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1}
+        \ {'short' : 'd', 'long' : 'macros',                'fold' : 1, 'stl' : 0, 'group' : 'd'},
+        \ {'short' : 'g', 'long' : 'enums',                 'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 's', 'long' : 'structs',               'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 'u', 'long' : 'unions',                'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 't', 'long' : 'typedefs',              'fold' : 1, 'stl' : 0, 'group' : 's'},
+        \ {'short' : 'e', 'long' : 'enumerators',           'fold' : 0, 'stl' : 0, 'group' : 'e'},
+        \ {'short' : 'p', 'long' : 'function declarations', 'fold' : 1, 'stl' : 0, 'group' : 'p'},
+        \ {'short' : 'v', 'long' : 'variables',             'fold' : 1, 'stl' : 0, 'group' : 'v'},
+        \ {'short' : 'f', 'long' : 'functions',             'fold' : 0, 'stl' : 1, 'group' : 'f'},
+        \ {'short' : 'm', 'long' : 'data members',          'fold' : 0, 'stl' : 0, 'group' : 'm'},
+    \ ]
+    let type_c.groups     = [
+        \ {'short' : 'd'},
+        \ {'short' : 's'},
+        \ {'short' : 'e'},
+        \ {'short' : 'p'},
+        \ {'short' : 'v'},
+        \ {'short' : 'f'},
+        \ {'short' : 'm'},
     \ ]
     let type_c.sro        = '::'
     let type_c.kind2scope = {
         \ 'g' : 'enum',
         \ 's' : 'struct',
-        \ 'u' : 'union'
+        \ 'u' : 'union',
+        \ 't' : 'using',
+        \ 'f' : 'function',
     \ }
     let type_c.scope2kind = {
-        \ 'enum'   : 'g',
-        \ 'struct' : 's',
-        \ 'union'  : 'u'
+        \ 'enum'      : 'g',
+        \ 'struct'    : 's',
+        \ 'union'     : 'u',
+        \ 'using'     : 't',
+        \ 'function'  : 'f',
     \ }
     let types.c = type_c
     " C++ {{{1
@@ -220,12 +232,12 @@ function! tagbar#types#uctags#init(supported_types) abort
     let type_cpp.ctagstype = 'c++'
     let type_cpp.kinds     = [
         \ {'short' : 'd', 'long' : 'macros',                'fold' : 1, 'stl' : 0, 'group' : 'd'},
-        \ {'short' : 'n', 'long' : 'namespaces',            'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'g', 'long' : 'enums',                 'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 's', 'long' : 'structs',               'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'c', 'long' : 'classes',               'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 'u', 'long' : 'unions',                'fold' : 0, 'stl' : 1, 'group' : 't'},
-        \ {'short' : 't', 'long' : 'typedefs',              'fold' : 1, 'stl' : 0, 'group' : 't'},
+        \ {'short' : 'n', 'long' : 'namespaces',            'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 'g', 'long' : 'enums',                 'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 's', 'long' : 'structs',               'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 'c', 'long' : 'classes',               'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 'u', 'long' : 'unions',                'fold' : 0, 'stl' : 1, 'group' : 's'},
+        \ {'short' : 't', 'long' : 'typedefs',              'fold' : 1, 'stl' : 0, 'group' : 's'},
         \ {'short' : 'e', 'long' : 'enumerators',           'fold' : 0, 'stl' : 0, 'group' : 'e'},
         \ {'short' : 'p', 'long' : 'function declarations', 'fold' : 1, 'stl' : 0, 'group' : 'p'},
         \ {'short' : 'v', 'long' : 'variables',             'fold' : 1, 'stl' : 0, 'group' : 'v'},
@@ -234,7 +246,7 @@ function! tagbar#types#uctags#init(supported_types) abort
     \ ]
     let type_cpp.groups     = [
         \ {'short' : 'd'},
-        \ {'short' : 't'},
+        \ {'short' : 's'},
         \ {'short' : 'e'},
         \ {'short' : 'p'},
         \ {'short' : 'v'},
