@@ -57,7 +57,11 @@ function! s:compare_by_kind(tag1, tag2) abort
 endfunction
 
 function! s:compare_by_line(tag1, tag2) abort
-    return a:tag1.fields.line - a:tag2.fields.line
+    if a:tag1.isPseudoTag() !=# a:tag2.isPseudoTag()
+        return a:tag1.isPseudoTag() - a:tag2.isPseudoTag()
+    else
+        return a:tag1.fields.line - a:tag2.fields.line
+    endif
 endfunction
 
 " vim: ts=8 sw=4 sts=4 et foldenable foldmethod=marker foldcolumn=1
