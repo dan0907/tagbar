@@ -1599,6 +1599,10 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let taginfo.fields.signature = '()'
     endif
 
+    if taginfo.name =~# '^__anon' && taginfo.fields.kind ==# 'f' && has_key(taginfo.fields, 'access')
+        call remove(taginfo.fields, 'access')
+    endif
+
     if has_key(taginfo.fields, 'properties')
         if taginfo.fields.properties =~# 'default'
             let taginfo.fields.kind = 'f'
