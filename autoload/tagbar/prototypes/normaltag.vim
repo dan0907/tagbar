@@ -158,11 +158,16 @@ function! s:getDataTypeFromTypeAlias() abort dict
         let linenr += 1
         let line .= getbufline(bufnr, linenr)[0]
     endwhile
-    if line !~# '='
+    if line !~# '\<' . self.name . '\s*='
         return ''
     endif
-    let t = substitute(line, '.*\<' . self.name . '\s*=\s*\(\S[^;]*\);.*', '\1', '')
-    let self.data_type = substitute(t, '\s\{2,}', ' ', 'g')
+    if line =~# '\<' . self.name . '\s*=\s*\<\(struct\|class\|enum\|union\)\>'
+        let data_type = substitute(line, '.*\<' . self.name . '\s*=\s*\(\S[^{]*\){.*', '\1', '')
+        let self.data_type = data_type
+    else
+        let data_type = substitute(line, '.*\<' . self.name . '\s*=\s*\(\S[^;]*\);.*', '\1', '')
+        let self.data_type = substitute(data_type, '\s\{2,}', ' ', 'g')
+    endif
     return self.data_type
 endfunction
 
