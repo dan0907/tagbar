@@ -15,6 +15,7 @@ function! tagbar#prototypes#normaltag#new(name) abort
     let newobj.str = function(s:add_snr('s:str'))
     let newobj.getPrototype = function(s:add_snr('s:getPrototype'))
     let newobj.getDataType = function(s:add_snr('s:getDataType'))
+    let newobj.getDataTypeFromTypeAlias = function(s:add_snr('s:getDataTypeFromTypeAlias'))
 
     return newobj
 endfunction
@@ -34,8 +35,11 @@ function! s:strfmt() abort dict
     endif
     let prefix = self._getPrefix()
 
-    if (self.fields.kind ==# 't' || g:tagbar_show_data_type) && self.data_type !=# ''
-        let suffix .= ' = ' . self.data_type
+    if (self.fields.kind ==# 't')
+        let data_type = self.getDataTypeFromTypeAlias()
+        if data_type !=# ''
+            let suffix .= ' = ' . data_type
+        endif
     endif
 
     if g:tagbar_show_tag_linenumbers == 1
@@ -137,6 +141,29 @@ function! s:getPrototype(short) abort dict
     endif
 
     return prototype
+endfunction
+
+" s:getDataTypeFromTypeAlias() {{{1
+function! s:getDataTypeFromTypeAlias() abort dict
+    if self.data_type !=# ''
+        return self.data_type
+    endif
+    let bufnr = self.fileinfo.bufnr
+    if self.fields.line == 0 || !bufloaded(bufnr)
+        return ''
+    endif
+    let linenr = self.fields.line
+    let line = getbufline(bufnr, linenr)[0]
+    while line !~# ';'
+        let linenr += 1
+        let line .= getbufline(bufnr, linenr)[0]
+    endwhile
+    if line !~# '='
+        return ''
+    endif
+    let t = substitute(line, '.*\<' . self.name . '\s*=\s*\(\S[^;]*\);.*', '\1', '')
+    let self.data_type = substitute(t, '\s\{2,}', ' ', 'g')
+    return self.data_type
 endfunction
 
 " s:getDataType() {{{1
