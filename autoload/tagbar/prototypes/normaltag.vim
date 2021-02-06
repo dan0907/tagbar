@@ -155,7 +155,7 @@ function! s:getDataTypeFromTypeAlias() abort dict
         let linenr += 1
         let line .= getbufline(bufnr, linenr)[0]
     endwhile
-    let pat = '\<' . self.name . '\s*\(\[\[.\+\]\]\)\?\s*=\s*'
+    let pat = '\<' . self.name . '\s*\(\[\s*\[.*\]\s*\]\)\?\s*=\s*'
     if line !~# pat || line =~# pat . '\<\(struct\|class\|enum\|union\|decltype\)\>'
         let self.data_type = 'type-id'
     else
