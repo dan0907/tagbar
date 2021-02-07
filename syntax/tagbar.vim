@@ -47,6 +47,7 @@ syntax match TagbarHelpTitle '" \zs-\+ \w\+ -\+' contained
 syntax match TagbarNestedKind '^\s\+\[[^]]\+\]$'
 syntax match TagbarSignature  '\([-+# ]using .\+\)\@<!\(\<operator *( *) *\)\?\zs(.*)[^=]*\ze'
 syntax match TagbarDelete     '\zs= delete\ze$'
+syntax match TagbarTypeId     '\<type-id\>'
 
 highlight default link TagbarHelp       Comment
 highlight default link TagbarHelpKey    Identifier
@@ -64,6 +65,7 @@ highlight default TagbarAccessPrivate   guifg=Red           ctermfg=Red
 highlight default TagbarScope           gui=Bold            cterm=Bold
 highlight default TagbarPseudoScope     guifg=LightMagenta  ctermfg=LightMagenta  gui=Bold  cterm=Bold
 highlight default TagbarDelete          guifg=Red           ctermfg=Red
+highlight default TagbarTypeId          guifg=Gray          ctermfg=Gray
 highlight default link TagbarVisibilityPublic    TagbarAccessPublic
 highlight default link TagbarVisibilityProtected TagbarAccessProtected
 highlight default link TagbarVisibilityPrivate   TagbarAccessPrivate

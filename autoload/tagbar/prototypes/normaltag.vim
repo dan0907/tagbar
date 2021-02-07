@@ -35,7 +35,7 @@ function! s:strfmt() abort dict
     endif
     let prefix = self._getPrefix()
 
-    if (self.fields.kind ==# 't')
+    if self.fields.kind ==# 't' && has_key(self.typeinfo, 'groups')
         let suffix .= ' = ' . self.getDataTypeFromTypeAlias()
     endif
 
@@ -145,19 +145,25 @@ function! s:getDataTypeFromTypeAlias() abort dict
     if self.data_type !=# ''
         return self.data_type
     endif
+    let typeidstr = 'type-id'
     let bufnr = self.fileinfo.bufnr
     if self.fields.line == 0 || !bufloaded(bufnr)
-        return 'type-id'
+        return typeidstr
     endif
     let linenr = self.fields.line
     let line = getbufline(bufnr, linenr)[0]
     while line !~# ';'
         let linenr += 1
-        let line .= getbufline(bufnr, linenr)[0]
+        let templist = getbufline(bufnr, linenr)
+        if empty(templist)
+            let self.data_type = typeidstr
+            return self.data_type
+        endif
+        let line .= templist[0]
     endwhile
     let pat = '\<' . self.name . '\s*\(\[\s*\[.*\]\s*\]\)\?\s*=\s*'
-    if line !~# pat || line =~# pat . '\<\(struct\|class\|enum\|union\|decltype\)\>'
-        let self.data_type = 'type-id'
+    if line !~# pat . '.*;' || line =~# pat . '\<\(struct\|class\|enum\|union\|decltype\)\>'
+        let self.data_type = typeidstr
     else
         let self.data_type = substitute(line, '.*' . pat . '\(\S[^;]*\);.*', '\2', '')
         let self.data_type = substitute(self.data_type, '\s\{2,}', ' ', 'g')
