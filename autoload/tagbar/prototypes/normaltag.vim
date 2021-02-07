@@ -145,7 +145,7 @@ function! s:getDataTypeFromTypeAlias() abort dict
     if self.data_type !=# ''
         return self.data_type
     endif
-    let typeidstr = 'type-id'
+    let typeidstr = '__type_id__'
     let bufnr = self.fileinfo.bufnr
     if self.fields.line == 0 || !bufloaded(bufnr)
         return typeidstr

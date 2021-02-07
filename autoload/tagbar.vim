@@ -1628,7 +1628,7 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let delimit = stridx(typeref, ':')
         let taginfo.data_type = s:CppStyleStr(strpart(typeref, delimit + 1))
         if taginfo.data_type =~# '^__anon'
-            let taginfo.data_type = 'type-id'
+            let taginfo.data_type = '__type_id__'
         endif
         "let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
     endif

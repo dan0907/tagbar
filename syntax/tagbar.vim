@@ -47,7 +47,7 @@ syntax match TagbarHelpTitle '" \zs-\+ \w\+ -\+' contained
 syntax match TagbarNestedKind '^\s\+\[[^]]\+\]$'
 syntax match TagbarSignature  '\([-+# ]using .\+\)\@<!\(\<operator *( *) *\)\?\zs(.*)[^=]*\ze'
 syntax match TagbarDelete     '\zs= delete\ze$'
-syntax match TagbarTypeId     '\(\<using\>.* = \)\@<=type-id\>$'
+syntax match TagbarTypeId     '\(\<using\>.* = \)\@<=__type_id__\>$'
 syntax match TagbarUnnamed    '\(".*\)\@<!\<__unnamed__\>'
 
 highlight default link TagbarHelp       Comment
