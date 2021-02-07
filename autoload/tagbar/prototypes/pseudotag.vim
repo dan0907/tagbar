@@ -28,7 +28,7 @@ function! s:strfmt() abort dict
         let prefix .= typeinfo.kind2scope[self.fields.kind] . ' '
     endif
 
-    return prefix . self.name . suffix . '  '
+    return prefix . self.displayname . suffix . '  '
 endfunction
 
 " s:add_snr() {{{1

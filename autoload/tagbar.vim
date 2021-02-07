@@ -1551,9 +1551,6 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let taginfo = tagbar#prototypes#splittag#new(a:name)
     else
         let taginfo = tagbar#prototypes#normaltag#new(a:name)
-        if a:name =~# '^__anon'
-            let taginfo.displayname = '__unnamed__'
-        endif
     endif
 
     let taginfo.file    = a:filename

@@ -11,7 +11,6 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj = {}
 
     let newobj.name          = a:name
-    let newobj.displayname   = a:name
     let newobj.fields        = {}
     let newobj.fields.line   = 0
     let newobj.fields.column = 0
@@ -29,6 +28,12 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj._childlist    = []
     let newobj._childdict    = {}
     let newobj.scopestr      = ''
+
+    if a:name =~# '^__anon'
+        let newobj.displayname   = '__unnamed__'
+    else
+        let newobj.displayname   = a:name
+    endif
 
     let newobj.isNormalTag = function(s:add_snr('s:isNormalTag'))
     let newobj.isPseudoTag = function(s:add_snr('s:isPseudoTag'))
