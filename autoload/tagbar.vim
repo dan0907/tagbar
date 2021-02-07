@@ -2368,7 +2368,12 @@ function! s:HighlightTag(openfolds, ...) abort
 
         " If printing the line number of the tag to the left, and the tag is
         " visible (I.E. parent isn't folded)
-        let identifier = '\zs\V' . escape(tag.name, '/\') . '\m\ze'
+        if tag.name =~# '^__anon'
+            let name = '__unnamed__'
+        else
+            let name = tag.name
+        endif
+        let identifier = '\zs\V' . escape(name, '/\') . '\m\ze'
         if g:tagbar_show_tag_linenumbers == 2 && tagline == tag.tline
             let pattern = '/^\%' . tagline . 'l\s*' . foldpat . '[-+# ]\[[0-9]\+\] \?' . identifier . '/'
         else
@@ -2377,7 +2382,7 @@ function! s:HighlightTag(openfolds, ...) abort
         call tagbar#debug#log("Highlight pattern: '" . pattern . "'")
         if hlexists('TagbarHighlight') " Safeguard in case syntax highlighting is disabled
             execute 'match TagbarHighlight ' . pattern
-            let target = '\(^\|\W\)\zs\V' . escape(tag.name, '\') . '\m\(\W\|$\)'
+            let target = '\(^\|\W\)\zs\V' . escape(name, '\') . '\m\(\W\|$\)'
             call search(target, 'c', line('.'))
         else
             execute 'match Search ' . pattern
