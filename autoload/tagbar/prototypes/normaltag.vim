@@ -53,12 +53,7 @@ function! s:strfmt() abort dict
     endif
     let prefix .= self.scopestr
 
-    if self.name =~# '^__anon'
-        let name = '__unnamed__'
-    else
-        let name = self.name
-    endif
-    return prefix . name . suffix
+    return prefix . self.displayname . suffix
 endfunction
 
 " s:str() {{{1

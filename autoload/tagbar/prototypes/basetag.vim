@@ -11,6 +11,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj = {}
 
     let newobj.name          = a:name
+    let newobj.displayname   = a:name
     let newobj.fields        = {}
     let newobj.fields.line   = 0
     let newobj.fields.column = 0

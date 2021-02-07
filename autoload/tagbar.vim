@@ -1551,6 +1551,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let taginfo = tagbar#prototypes#splittag#new(a:name)
     else
         let taginfo = tagbar#prototypes#normaltag#new(a:name)
+        if a:name =~# '^__anon'
+            let taginfo.displayname = '__unnamed__'
+        endif
     endif
 
     let taginfo.file    = a:filename
@@ -1627,6 +1630,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let typeref = taginfo.fields.typeref
         let delimit = stridx(typeref, ':')
         let taginfo.data_type = s:CppStyleStr(strpart(typeref, delimit + 1))
+        if taginfo.data_type =~# '^__anon'
+            let taginfo.data_type = '__unnamed__'
+        endif
         "let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
     endif
 
@@ -2368,12 +2374,7 @@ function! s:HighlightTag(openfolds, ...) abort
 
         " If printing the line number of the tag to the left, and the tag is
         " visible (I.E. parent isn't folded)
-        if tag.name =~# '^__anon'
-            let name = '__unnamed__'
-        else
-            let name = tag.name
-        endif
-        let identifier = '\zs\V' . escape(name, '/\') . '\m\ze'
+        let identifier = '\zs\V' . escape(tag.displayname, '/\') . '\m\ze'
         if g:tagbar_show_tag_linenumbers == 2 && tagline == tag.tline
             let pattern = '/^\%' . tagline . 'l\s*' . foldpat . '[-+# ]\[[0-9]\+\] \?' . identifier . '/'
         else
@@ -2382,7 +2383,7 @@ function! s:HighlightTag(openfolds, ...) abort
         call tagbar#debug#log("Highlight pattern: '" . pattern . "'")
         if hlexists('TagbarHighlight') " Safeguard in case syntax highlighting is disabled
             execute 'match TagbarHighlight ' . pattern
-            let target = '\(^\|\W\)\zs\V' . escape(name, '\') . '\m\(\W\|$\)'
+            let target = '\(^\|\W\)\zs\V' . escape(tag.displayname, '\') . '\m\(\W\|$\)'
             call search(target, 'c', line('.'))
         else
             execute 'match Search ' . pattern
