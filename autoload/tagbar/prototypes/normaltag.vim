@@ -47,7 +47,7 @@ function! s:strfmt() abort dict
 
     if has_key(get(typeinfo, 'kind2scope', {}), self.fields.kind) && self.fields.kind !=# 'f'
         let self.scopestr = s:maybe_map_scope(typeinfo.kind2scope[self.fields.kind]) . ' '
-        if has_key(self.fields, 'properties') && self.fields.properties =~# 'scopedenum'
+        if self.scopedenum
             let self.scopestr .= 'class '
         endif
     endif

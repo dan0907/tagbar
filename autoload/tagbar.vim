@@ -1283,6 +1283,7 @@ function! s:ProcessFile(fname, ftype) abort
     call tagbar#debug#log('Parsing ctags output')
     let rawtaglist = split(ctags_output, '\n\+')
     let seen = {}
+    let unnamedtypedict = {}
     for line in rawtaglist
         " skip comments and duplicates (can happen when --sort=no)
         if line =~# '^!_TAG_' || has_key(seen, line)
@@ -1297,8 +1298,12 @@ function! s:ProcessFile(fname, ftype) abort
 
         let parts = split(line, ';"')
         if len(parts) == 2 " Is a valid tag line
-            call s:ParseTagline(parts[0], parts[1], typeinfo, fileinfo)
+            call s:ParseTagline(parts[0], parts[1], typeinfo, fileinfo, unnamedtypedict)
         endif
+    endfor
+
+    for taginfo in fileinfo.getTags()
+        call taginfo.initQualifiedName(unnamedtypedict)
     endfor
 
     " Create a placeholder tag for the 'kind' header for folding purposes, but
@@ -1458,7 +1463,7 @@ endfunction
 " tagname<TAB>filename<TAB>expattern;"fields
 " fields: <TAB>name:value
 " fields that are always present: kind, line
-function! s:ParseTagline(part1, part2, typeinfo, fileinfo) abort
+function! s:ParseTagline(part1, part2, typeinfo, fileinfo, unnamedtypedict) abort
     let basic_info  = split(a:part1, '\t')
     let tagname  = basic_info[0]
     let filename = basic_info[1]
@@ -1524,7 +1529,7 @@ function! s:ParseTagline(part1, part2, typeinfo, fileinfo) abort
         for i in range(len(tagparts))
             let part = tagparts[i]
             call s:ProcessTag(part, filename, pattern, curfielddict,
-                            \ i != len(tagparts) - 1, a:typeinfo, a:fileinfo)
+                            \ i != len(tagparts) - 1, a:typeinfo, a:fileinfo, a:unnamedtypedict)
             if parent !=# ''
                 let parent = parent . a:typeinfo.sro . part
             else
@@ -1535,7 +1540,7 @@ function! s:ParseTagline(part1, part2, typeinfo, fileinfo) abort
         endfor
     else
         call s:ProcessTag(tagname, filename, pattern, fielddict, 0,
-                        \ a:typeinfo, a:fileinfo)
+                        \ a:typeinfo, a:fileinfo, a:unnamedtypedict)
     endif
 endfunction
 
@@ -1546,7 +1551,7 @@ function! s:CppStyleStr(str) abort
 endfunction
 
 " s:ProcessTag() {{{2
-function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, fileinfo) abort
+function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, fileinfo, unnamedtypedict) abort
     if a:is_split
         let taginfo = tagbar#prototypes#splittag#new(a:name)
     else
@@ -1604,7 +1609,9 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
     endif
 
     if has_key(taginfo.fields, 'properties')
-        if taginfo.fields.properties =~# 'default'
+        if taginfo.fields.properties =~# 'scopedenum'
+            let taginfo.scopedenum = 1
+        elseif taginfo.fields.properties =~# 'default'
             let taginfo.fields.kind = 'f'
         elseif taginfo.fields.properties =~# 'delete'
             let taginfo.fields.kind = 'f'
@@ -1612,7 +1619,7 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         endif
     endif
 
-    if (has_key(a:typeinfo, 'groups'))
+    if has_key(a:typeinfo, 'groups')
         let taginfo.fields.group = a:typeinfo.getKind(taginfo.fields.kind).group
     else
         let taginfo.fields.group = taginfo.fields.kind
@@ -1627,7 +1634,11 @@ function! s:ProcessTag(name, filename, pattern, fields, is_split, typeinfo, file
         let typeref = taginfo.fields.typeref
         let delimit = stridx(typeref, ':')
         let taginfo.data_type = s:CppStyleStr(strpart(typeref, delimit + 1))
-        if taginfo.data_type =~# '^__anon'
+        let pat = '\(\<__anon\w\+\>\)\(' . a:typeinfo.sro . '\)\@!'
+        if taginfo.data_type =~# pat
+            let unnamedtype = substitute(taginfo.data_type,
+                \ '.*' . pat . '.*', '\1', '')
+            let a:unnamedtypedict[unnamedtype] = 0
             let taginfo.data_type = '__type_id__'
         endif
         "let taginfo.data_type = s:CppStyleStr(substitute(strpart(typeref, delimit + 1), '\t', '', 'g'))
@@ -3759,21 +3770,21 @@ endfunction
 
 " TagbarBalloonExpr() {{{2
 function! TagbarBalloonExpr() abort
-    let taginfo = s:GetTagInfo(v:beval_lnum, 1)
+    let taginfo = s:GetTagInfo(v:beval_lnum, 0)
 
-    if empty(taginfo)
+    if empty(taginfo) || !(taginfo.isNormalTag() || taginfo.isPseudoTag())
         return ''
     endif
 
-    let prototype = taginfo.getPrototype(0)
+    let qualifiedname = taginfo.qualifiedname
     if has('multi_byte')
         if g:tagbar_systemenc != &encoding
-            let prototype = iconv(prototype, &encoding, g:tagbar_systemenc)
+            let qualifiedname = iconv(qualifiedname, &encoding, g:tagbar_systemenc)
         elseif $LANG !=# ''
-            let prototype = iconv(prototype, &encoding, $LANG)
+            let qualifiedname = iconv(qualifiedname, &encoding, $LANG)
         endif
     endif
-    return prototype
+    return qualifiedname
 endfunction
 
 " Autoload functions {{{1

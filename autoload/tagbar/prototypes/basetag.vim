@@ -20,6 +20,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.path          = ''
     let newobj.fullpath      = a:name
     let newobj.fullname      = a:name
+    let newobj.qualifiedname = a:name
     let newobj.depth         = 0
     let newobj.parent        = {}
     let newobj.tline         = -1
@@ -28,11 +29,14 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj._childlist    = []
     let newobj._childdict    = {}
     let newobj.scopestr      = ''
+    let newobj.scopedenum    = 0
 
     if a:name =~# '^__anon'
         let newobj.displayname   = '__unnamed__'
+        let newobj.unnamed       = 1
     else
         let newobj.displayname   = a:name
+        let newobj.unnamed       = 0
     endif
 
     let newobj.isNormalTag = function(s:add_snr('s:isNormalTag'))
@@ -54,6 +58,7 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.getChildren = function(s:add_snr('s:getChildren'))
     let newobj.getChildrenByName = function(s:add_snr('s:getChildrenByName'))
     let newobj.removeChild = function(s:add_snr('s:removeChild'))
+    let newobj.initQualifiedName = function(s:add_snr('s:initQualifiedName'))
 
     return newobj
 endfunction
@@ -113,12 +118,36 @@ function! s:_getPrefix() abort dict
     return prefix
 endfunction
 
+
+" s:initQualifiedName() {{{1
+function! s:initQualifiedName(unnamedtypedict) abort dict
+    let parent = self.parent
+    while !empty(parent)
+          \ && (parent.fields.kind ==# 'g' && !parent.scopedenum
+          \ || parent.fields.kind ==# 'u' && parent.unnamed && !has_key(a:unnamedtypedict, parent.name))
+        let parent = parent.parent
+    endwhile
+    if !empty(parent)
+        if parent.fields.kind ==# 'f'
+            let self.qualifiedname = self.displayname
+        else
+            let self.qualifiedname = parent.qualifiedname . self.typeinfo.sro . self.displayname
+        endif
+    else
+        let self.qualifiedname = self.typeinfo.sro . self.displayname
+    endif
+    for child in self._childlist
+        call child.initQualifiedName(a:unnamedtypedict)
+    endfor
+endfunction
+
 " s:initFoldState() {{{1
 function! s:initFoldState(known_files) abort dict
     let fileinfo = self.fileinfo
 
-    if !empty(self.parent)
-        let self.fullname = self.parent.fullname . self.typeinfo.sro . self.name
+    let parent = self.parent
+    if !empty(parent)
+        let self.fullname = parent.fullname . self.typeinfo.sro . self.name
     else
         let self.fullname = self.fullpath
     endif
