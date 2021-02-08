@@ -134,7 +134,11 @@ function! s:initQualifiedName(unnamedtypedict) abort dict
             let self.qualifiedname = parent.qualifiedname . self.typeinfo.sro . self.displayname
         endif
     else
-        let self.qualifiedname = self.typeinfo.sro . self.displayname
+        if self.fields.kind ==# 'd'
+            let self.qualifiedname = self.displayname
+        else
+            let self.qualifiedname = self.typeinfo.sro . self.displayname
+        endif
     endif
     for child in self._childlist
         call child.initQualifiedName(a:unnamedtypedict)

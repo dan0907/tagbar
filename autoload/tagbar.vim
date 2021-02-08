@@ -1302,9 +1302,11 @@ function! s:ProcessFile(fname, ftype) abort
         endif
     endfor
 
-    for taginfo in fileinfo.getTags()
-        call taginfo.initQualifiedName(unnamedtypedict)
-    endfor
+    if has_key(typeinfo, 'groups')
+        for taginfo in fileinfo.getTags()
+            call taginfo.initQualifiedName(unnamedtypedict)
+        endfor
+    endif
 
     " Create a placeholder tag for the 'kind' header for folding purposes, but
     " only for non-scoped tags
