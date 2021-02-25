@@ -32,11 +32,15 @@ function! tagbar#prototypes#basetag#new(name) abort
     let newobj.scopedenum    = 0
 
     if a:name =~# '^__anon'
-        let newobj.displayname   = '__unnamed__'
-        let newobj.unnamed       = 1
+        let newobj.displayname = '__unnamed__'
+        let newobj.unnamed     = 1
     else
-        let newobj.displayname   = a:name
-        let newobj.unnamed       = 0
+        if a:name =~# '^operator\s\+\W'
+            let newobj.displayname = substitute(a:name, '^operator\zs\s\+', '', '')
+        else
+            let newobj.displayname = a:name
+        endif
+        let newobj.unnamed = 0
     endif
 
     let newobj.isNormalTag = function(s:add_snr('s:isNormalTag'))
