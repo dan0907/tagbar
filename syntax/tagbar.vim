@@ -13,7 +13,7 @@ endif
 
 let s:ics = escape(join(g:tagbar_iconchars, ''), ']^\-')
 
-let s:pattern = '\(^[' . s:ics . '] \)\@<=\[.\+\]$'
+let s:pattern = '\(^[' . s:ics . ']\)\@<=\[.\+\]$'
 execute "syntax match TagbarKind '" . s:pattern . "'"
 
 let s:pattern = '\(^ *[' . s:ics . ' ][-+# ]\)\@<=[a-z][a-z ]\+\( \w\+\(  \| = .\+\)\?$\)\@='
@@ -25,7 +25,7 @@ execute "syntax match TagbarScope '" . s:pattern . "'"
 let s:pattern = '\(^ *[' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(  $\)\@='
 execute "syntax match TagbarPseudoScope '" . s:pattern . "'"
 
-let s:pattern = '^ *[' . s:ics . ']\([-+# ]\)\@='
+let s:pattern = '^ *[' . s:ics . ']\([-+# \[]\)\@='
 execute "syntax match TagbarFoldIcon '" . s:pattern . "'"
 
 let s:pattern = '\(^ *[' . s:ics . ' ]\)\@<=+\([^-+# ]\)\@='

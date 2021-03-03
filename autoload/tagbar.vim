@@ -2100,12 +2100,11 @@ function! s:PrintKinds(typeinfo, fileinfo) abort
                 let foldmarker = g:tagbar#icon_open
             endif
 
-            let padding = g:tagbar_show_visibility ? ' ' : ''
             if g:tagbar_show_tag_count
                 let tag_count = ' (' . len(curtags) . ')'
-                call add(output, foldmarker . padding . kind.long . tag_count)
+                call add(output, foldmarker . kind.long . tag_count)
             else
-                call add(output, foldmarker . padding . '[' . kind.long . ']')
+                call add(output, foldmarker . '[' . kind.long . ']')
             endif
 
             let curline                   = len(output) + offset
@@ -2183,9 +2182,7 @@ function! s:PrintTag(tag, depth, output, fileinfo, typeinfo) abort
                 " identifier)
                 if !has_key(a:typeinfo.kind2scope, group.short) || group.short ==# 'f'
                     let ckind = a:typeinfo.getKind(group.short)
-                    let indent  = (a:depth + 1) * g:tagbar_indent
-                    let indent += g:tagbar_show_visibility
-                    let indent += 1 " fold symbol
+                    let indent  = (a:depth + 1) * g:tagbar_indent + 1
                     call add(a:output, repeat(' ', indent) . '[' . ckind.long . ']')
                     " Add basic tag to allow folding when on the header line
                     let headertag = tagbar#prototypes#basetag#new(ckind.long)
@@ -3003,9 +3000,9 @@ function! s:CheckMouseClick() abort
     let line   = getline('.')
     let curcol = col('.')
 
-    if (match(line, g:tagbar#icon_open . '[-+ ]') + 1) == curcol
+    if (match(line, g:tagbar#icon_open . '[-+ \[]') + 1) == curcol
         call s:CloseFold()
-    elseif (match(line, g:tagbar#icon_closed . '[-+ ]') + 1) == curcol
+    elseif (match(line, g:tagbar#icon_closed . '[-+ \[]') + 1) == curcol
         call s:OpenFold()
     elseif g:tagbar_singleclick
         call s:JumpToTag(0)
