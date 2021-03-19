@@ -16,13 +16,13 @@ let s:ics = escape(join(g:tagbar_iconchars, ''), ']^\-')
 let s:pattern = '\(^[' . s:ics . ']\)\@<=\[.\+\]$'
 execute "syntax match TagbarKind '" . s:pattern . "'"
 
-let s:pattern = '\(^ *[' . s:ics . ' ][-+# ]\)\@<=[a-z][a-z ]\+\( \w\+\(  \| = .\+\)\?$\)\@='
+let s:pattern = '\(^ *[' . s:ics . ' ][-+# ]\)\@<=[a-z]\+\( class\)\?\( \w\+\(.*  \| = .\+\)\?$\)\@='
 execute "syntax match TagbarScopeType '" . s:pattern . "'"
 
-let s:pattern = '\(^ *[' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(\( = .\+\)\?$\)\@='
+let s:pattern = '\(^ *[' . s:ics . ' ][-+# ][a-z]\+\( class\)\? \)\@<=\w\+\(\( = .\+\)\?$\)\@='
 execute "syntax match TagbarScope '" . s:pattern . "'"
 
-let s:pattern = '\(^ *[' . s:ics . ' ][-+# ][a-z][a-z ]\+ \)\@<=\w\+\(  $\)\@='
+let s:pattern = '\(^ *[' . s:ics . ' ][-+# ][a-z]\+ \)\@<=\w.*\(  $\)\@='
 execute "syntax match TagbarPseudoScope '" . s:pattern . "'"
 
 let s:pattern = '^ *[' . s:ics . ']\([-+# \[]\)\@='
